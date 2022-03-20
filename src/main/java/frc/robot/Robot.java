@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
           // external intake used to be neo 550 but it was changed to a 775 motor 
   //private final CANSparkMax externalIntake = new CANSparkMax(3, MotorType.kBrushless);
 //  private final CANSparkMax climber = new CANSparkMax(6, MotorType.kBrushless);
-  private final CANSparkMax climber = new CANSparkMax(7, MotorType.kBrushless);   // sparkMax 6 was acting up, switching to 7
+  private final CANSparkMax climber = new CANSparkMax(6, MotorType.kBrushless);
 //  private final CANSparkMax climber2 = new CANSparkMax(7, MotorType.kBrushless);
 //  private final CANSparkMax climber3 = new CANSparkMax(8, MotorType.kBrushless);
 
@@ -105,7 +105,7 @@ private double outputValue = 0;   // for whatever we need, remove for production
           autoTime = 0;       // this will tell the next step its time to init
         }
 */
-SmartDashboard.putNumber("autoStep", autoStep);
+SmartDashboard.putNumber("autoStep", autoStep); // a comment
 SmartDashboard.putNumber("autoTime", autoTime);
         /* step 0 */
     if (autoStep == 0) {
@@ -299,7 +299,6 @@ SmartDashboard.putNumber("autoTime", autoTime);
         climberSpeedTarget = 0,
         advancerMax = SmartDashboard.getNumber("Advancer Max", 1.0),
         advancerDelay = SmartDashboard.getNumber("Advancer Delay (ms)", 3000),
-advancerTime = SmartDashboard.getNumber("Advancer Time (ms)", 0),
         shooterMax = SmartDashboard.getNumber("Shooter Max", 1.0);
 
            
@@ -321,10 +320,8 @@ advancerTime = SmartDashboard.getNumber("Advancer Time (ms)", 0),
 
     if (opStick.getBButton() && opStick.getXButton()) {
       advancer.set(-1 * advancerMax);
-advancerTime += 20;
     } else if (opStick.getBButton()) {
       advancer.set(advancerMax);
-advancerTime += 20;
     } else {
       advancer.set(0);
     }
@@ -368,9 +365,11 @@ advancerTime += 20;
         /* X Box Controller stick buttons */
         // climber #1
     climberSpeedTarget = climbStick.getLeftY();
+/*
     if (climberlimitSwitch.get()) {
       climberSpeedTarget = -1 * climberSpeedTarget;
     }
+    */
     climber.set(climberSpeedTarget);
     /* end of X Box Controller buttons */
 
@@ -384,7 +383,6 @@ advancerTime += 20;
     SmartDashboard.putNumber("outputValue", outputValue);
     SmartDashboard.putNumber("Advancer Max", advancerMax);
     SmartDashboard.putNumber("Advancer Delay (ms)", advancerDelay);
-SmartDashboard.putNumber("Advancer Time (ms)", advancerTime);
     SmartDashboard.putNumber("Shooter Max", shooterMax);
     SmartDashboard.putBoolean("Advancer Limit", advancerLimitSwitch.get());
 
