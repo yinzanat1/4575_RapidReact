@@ -109,7 +109,7 @@ SmartDashboard.putNumber("autoStep", autoStep); // a comment
 SmartDashboard.putNumber("autoTime", autoTime);
         /* step 0 */
     if (autoStep == 0) {
-      shooter.set(-0.8);
+      shooter.set(-0.65);
     }
     if (autoStep == 0 && autoTime >= 1350) {
       // leaving the shooter on, will turn it off at the end of step 1
@@ -126,7 +126,6 @@ SmartDashboard.putNumber("autoTime", autoTime);
     if (autoStep == 1 && autoTime >= 1000) {
       advancer.set (0);
       shooter.set (0);
-
       autoStep++;         // move to the next step
       autoTime = 0;   // this will tell the next step its time to init
     }
@@ -149,14 +148,14 @@ SmartDashboard.putNumber("autoTime", autoTime);
     }
 
 //    if (autoStep == 3 && autoTime >= driveOffset) { 
-    if (autoStep == 3 && autoTime >= 0) { 
+    if (autoStep == 3 && autoTime >= 500) { 
       autoStep++;         // move to the next step
       autoTime = 0;   // this will tell the next step its time to init
     }
 
     /* step 4 */
     if (autoStep == 4) {      
-      intakeInOut.set (-1);
+//      intakeInOut.set (-1);
       m_robotDrive.tankDrive(0.5, -0.5);
     }
 
@@ -170,8 +169,10 @@ SmartDashboard.putNumber("autoTime", autoTime);
     if (autoStep == 5) {      // tank drive needs constant speed settings, so keep hitting this 
         // do nothing, this is just to stop the rotation
     }
-    if (autoStep == 5 && autoTime >= 200) {
+    if (autoStep == 5 && autoTime >= 600) {
       m_robotDrive.tankDrive(0, 0);
+autoStep = 40;  // disable all steps after this one
+
       autoStep++;         // move to the next step
       autoTime = 0;   // this will tell the next step its time to init
     }
@@ -407,13 +408,13 @@ SmartDashboard.putNumber("autoTime", autoTime);
 
   private double deadbandJoystick (double inAxis) {
     double retVal;
-    if (Math.abs(inAxis) < 0.1) {
+    if (Math.abs(inAxis) < 0.2) {
       retVal = 0;
     } else {
       retVal = inAxis;
     }
         // square the value for better sensitivity
-//    retVal = Math.signum(retVal) * Math.pow(retVal, 2);
+    retVal = Math.signum(retVal) * Math.pow(retVal, 2);
   
     return retVal;
   }
