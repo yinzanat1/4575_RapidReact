@@ -110,26 +110,24 @@ SmartDashboard.putNumber("autoTime", autoTime);
         /* step 0 */
     if (autoStep == 0) {
       shooter.set(-0.65);
-    }
-    if (autoStep == 0 && autoTime >= 1350) {
-      // leaving the shooter on, will turn it off at the end of step 1
+      if (autoTime >= 1350) {
+        // leaving the shooter on, will turn it off at the end of step 1
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
-
         /* step 1 */
     if (autoStep == 1 && autoTime == 0) {
       advancer.set(1);
-    }
 
-    if (autoStep == 1 && autoTime >= 1000) {
-      advancer.set (0);
-      shooter.set (0);
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+      if (autoTime >= 1000) {
+        advancer.set (0);
+        shooter.set (0);
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
-
     /* step 2 */
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
       m_robotDrive.tankDrive(-0.5, -0.5);
