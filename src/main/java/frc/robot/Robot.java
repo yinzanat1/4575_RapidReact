@@ -62,7 +62,6 @@ public class Robot extends TimedRobot {
       /* end of switch & sensor declarations */
   /* end of hardware declarations */
 
-
         /* define variables here that will hold their values from pass to pass */
   private double shooterTime;
   private int autoStep = 0;
@@ -107,7 +106,16 @@ private double outputValue = 0;   // for whatever we need, remove for production
 */
 SmartDashboard.putNumber("autoStep", autoStep); // a comment
 SmartDashboard.putNumber("autoTime", autoTime);
-        /* step 0 */
+/*
+if (autoStep == 0) {
+  m_robotDrive.tankDrive(-0.5, 0.5);
+  
+  if (autoTime > 960) {
+    autoStep = 40;
+  }
+} 
+*/ 
+/* step 0 */
     if (autoStep == 0) {
       shooter.set(-0.65);
       if (autoTime >= 1350) {
@@ -117,8 +125,9 @@ SmartDashboard.putNumber("autoTime", autoTime);
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
+
         /* step 1 */
-    if (autoStep == 1 && autoTime == 0) {
+    if (autoStep == 1) {
       advancer.set(1);
 
       if (autoTime >= 1000) {
@@ -131,132 +140,125 @@ SmartDashboard.putNumber("autoTime", autoTime);
     /* step 2 */
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
       m_robotDrive.tankDrive(-0.5, -0.5);
-    }
 
-    if (autoStep == 2 && autoTime >= 1000) {
-      m_robotDrive.tankDrive(0, 0);
+      if (autoTime >= 1000) {
+        m_robotDrive.tankDrive(0, 0);
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
     /* step 3 */
-    if (autoStep == 3 && autoTime == 0) {   
+    if (autoStep == 3) {   
       // do nothing, this is a wait step just to let the robot settle before turning
-    }
 
-//    if (autoStep == 3 && autoTime >= driveOffset) { 
-    if (autoStep == 3 && autoTime >= 500) { 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+      if (autoTime >= 500) { 
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
     /* step 4 */
     if (autoStep == 4) {      
-//      intakeInOut.set (-1);
+      intakeInOut.set (-1);
       m_robotDrive.tankDrive(0.5, -0.5);
-    }
 
-    if (autoStep == 4 && autoTime >= 950) {
-      intakeInOut.set(0);
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+      if (autoTime >= 950) {
+        intakeInOut.set(0);
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
     /* step 5 */
-    if (autoStep == 5) {      // tank drive needs constant speed settings, so keep hitting this 
-        // do nothing, this is just to stop the rotation
-    }
-    if (autoStep == 5 && autoTime >= 600) {
-      m_robotDrive.tankDrive(0, 0);
-autoStep = 40;  // disable all steps after this one
+    if (autoStep == 5) {
+      // keep rotating 
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+      if (autoTime >= 200) {
+        m_robotDrive.tankDrive(0, 0);
+
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
      /* step 6 */
      if (autoStep == 6) {   // tank drive needs constant speed settings, so keep hitting this 
-      intake.set (1);
-      externalIntake.set(1);
+      intake.set (-1);
+      externalIntake.set(-1);
       m_robotDrive.tankDrive(0.5, 0.5);
-    }
 
-//    if (autoStep == 6 && autoTime >= 2200 + extraDrive) {
-    if (autoStep == 6 && autoTime >= 2200) {
-      m_robotDrive.tankDrive(0, 0);
-      intake.set (0);
-      externalIntake.set(0);
+      if (autoTime >= 2000) {
+        m_robotDrive.tankDrive(0, 0);
+        intake.set (0);
+        externalIntake.set(0);
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
     /* step 7 */
     if (autoStep == 7) {      // tank drive needs constant speed settings, so keep hitting this 
       m_robotDrive.tankDrive(-0.5, 0.5);
-    }
 
-    if (autoStep == 7 && autoTime >= 1150) {
-      m_robotDrive.tankDrive(0, 0);
+      if (autoStep == 7 && autoTime >= 1150) {
+        m_robotDrive.tankDrive(0, 0);
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
     /* step 8 */
     if (autoStep == 8) {   
       m_robotDrive.tankDrive(0.5, 0.5);
-      shooter.set(-0.8);
+      shooter.set(-0.65);
+   
+      if (autoTime >= 2000) {
+  //      m_robotDrive.tankDrive(0, 0);
+
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
-
-//    if (autoStep == 8 && autoTime >= 3100 + extraDrive) {
-    if (autoStep == 8 && autoTime >= 1100) {
-//      m_robotDrive.tankDrive(0, 0);
-
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
-    }
-
         /* step 9 */
     if (autoStep == 9) {
       advancer.set(1);
-    }
 
-    if (autoStep == 9 && autoTime >= 2000) {
-      m_robotDrive.tankDrive(0, 0);
+      if (autoTime >= 3300) {
+        m_robotDrive.tankDrive(0, 0);
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
-    
         /* step 10 */
     if (autoStep == 10) {
       advancer.set(1);
-    }
 
-    if (autoStep == 10 && autoTime >= 500) {
-      advancer.set (0);
-      shooter.set (0);
-      m_robotDrive.tankDrive(0, 0);
+      if (autoTime >= 500) {
+        advancer.set (0);
+        shooter.set (0);
+        m_robotDrive.tankDrive(0, 0);
 
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
 
     /* step 11 */
     if (autoStep == 11) {   
       m_robotDrive.tankDrive(-0.5, -0.5);
+
+      if (autoTime >= 3500) {
+        m_robotDrive.tankDrive(0, 0);
+
+        autoStep++;         // move to the next step
+        autoTime = 0;   // this will tell the next step its time to init
+      }
     }
-
-//    if (autoStep == 11 && autoTime >= 3100 + extraDrive) {
-    if (autoStep == 11 && autoTime >= 3100) {
-      m_robotDrive.tankDrive(0, 0);
-
-      autoStep++;         // move to the next step
-      autoTime = 0;   // this will tell the next step its time to init
-    }
-
 
     // autonomousPeriodic runs every 20ms so add 20ms to the counter
     autoTime+= 20;
