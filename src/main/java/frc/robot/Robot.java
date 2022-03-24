@@ -178,13 +178,14 @@ if (autoStep == 0) {
       if (autoTime >= 200) {
         m_robotDrive.tankDrive(0, 0);
 
-        autoStep++;         // move to the next step
+        autoStep++;     // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
 
      /* step 6 */
-     if (autoStep == 6) {   // tank drive needs constant speed settings, so keep hitting this 
+     if (autoStep == 6) { 
+          // start intakes and drive toward the ball
       intake.set (-1);
       externalIntake.set(-1);
       m_robotDrive.tankDrive(0.5, 0.5);
@@ -194,19 +195,20 @@ if (autoStep == 0) {
         intake.set (0);
         externalIntake.set(0);
 
-        autoStep++;         // move to the next step
+        autoStep++;     // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
 
     /* step 7 */
-    if (autoStep == 7) {      // tank drive needs constant speed settings, so keep hitting this 
+    if (autoStep == 7) {
+          // turn toward the target
       m_robotDrive.tankDrive(-0.5, 0.5);
 
       if (autoStep == 7 && autoTime >= 1150) {
         m_robotDrive.tankDrive(0, 0);
 
-        autoStep++;         // move to the next step
+        autoStep++;     // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
