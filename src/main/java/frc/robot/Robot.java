@@ -33,10 +33,10 @@ public class Robot extends TimedRobot {
   private final CANSparkMax m_backRight = new CANSparkMax(5, MotorType.kBrushless);
   MotorControllerGroup m_rightMotor = new MotorControllerGroup(m_frontRight, m_backRight);
 
-          // external intake used to be neo 550 but it was changed to a 775 motor 
+          // external intake used to be neo 550 but it was changed to a 775 motor, left this here as an example
   //private final CANSparkMax externalIntake = new CANSparkMax(3, MotorType.kBrushless);
 //  private final CANSparkMax climber = new CANSparkMax(6, MotorType.kBrushless);
-  private final CANSparkMax climber = new CANSparkMax(6, MotorType.kBrushless);
+  private final CANSparkMax climber = new CANSparkMax(3, MotorType.kBrushless);
 //  private final CANSparkMax climber2 = new CANSparkMax(7, MotorType.kBrushless);
 //  private final CANSparkMax climber3 = new CANSparkMax(8, MotorType.kBrushless);
 
@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
   private final Spark shooter = new Spark(2);
   private final Spark intakeInOut = new Spark(3);
   private final Spark externalIntake = new Spark(5);          /* 775 motor version of external intake */
+  private final Spark climberPivot = new Spark(6);
 
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
       /* end of motor and controller delcarations */
@@ -372,6 +373,7 @@ if (autoStep == 0) {
     }
     */
     climber.set(climberSpeedTarget);
+    climberPivot.set(climbStick.getRightX());
     /* end of X Box Controller buttons */
 
       /* dashboard logic */
