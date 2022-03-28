@@ -55,7 +55,9 @@ public class Robot extends TimedRobot {
 //  private final Joystick opStick = new Joystick(1);
   private final XboxController opStick = new XboxController(1);
   private final XboxController climbStick = new XboxController(2);
-      /* end of controller declarations */
+  private final Joystick driverStickBackwards = new Joystick(3);
+
+  /* end of controller declarations */
 
       /* limit switch and sensor declarations */
   private DigitalInput climberlimitSwitch = new DigitalInput(0);
@@ -140,11 +142,11 @@ if (autoStep == 0) {
     }
     /* step 2 */
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
-      m_robotDrive.tankDrive(-0.5, -0.5);
+      m_robotDrive.tankDrive(-0.5, 0.5);
 
-      if (autoTime >= 1000) {
+      if (autoTime >= 2500) {
         m_robotDrive.tankDrive(0, 0);
-
+autoStep = 40;
         autoStep++;         // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
@@ -303,10 +305,14 @@ if (autoStep == 0) {
         climberSpeedTarget = 0,
         advancerMax = SmartDashboard.getNumber("Advancer Max", 1.0),
         advancerDelay = SmartDashboard.getNumber("Advancer Delay (ms)", 3000),
-        shooterMax = SmartDashboard.getNumber("Shooter Max", 1.0);
+        shooterMax = SmartDashboard.getNumber("Shooter Max", 0.57);
 
-           
+boolean reverseJoystick = driverStick.getRawButton(12);
+if (!reverseJoystick) {
+  m_robotDrive.arcadeDrive(cleanZ, -cleanY); // fixing a problem
+  } else {           
     m_robotDrive.arcadeDrive(-cleanY, cleanZ);
+}    
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the Z turns left and right.
@@ -341,7 +347,7 @@ if (autoStep == 0) {
         advancer.set(0);
       }      
     } else if (opStick.getAButton()) {
-      shooter.set(-1 * shooterMax);
+      shooter.set(-1 * (opStick.getLeftBumper() ? 0.40 : shooterMax));
       if (shooterTime == 0) {
         shooterTime = System.currentTimeMillis();
       }
@@ -369,11 +375,11 @@ if (autoStep == 0) {
         /* X Box Controller stick buttons */
         // climber #1
     climberSpeedTarget = climbStick.getLeftY();
-/*
+
     if (climberlimitSwitch.get()) {
       climberSpeedTarget = -1 * climberSpeedTarget;
     }
-    */
+
     climber.set(climberSpeedTarget);
     climberPivot.set(climbStick.getRightX());
     /* end of X Box Controller buttons */
@@ -390,7 +396,7 @@ if (autoStep == 0) {
     SmartDashboard.putNumber("Advancer Delay (ms)", advancerDelay);
     SmartDashboard.putNumber("Shooter Max", shooterMax);
     SmartDashboard.putBoolean("Advancer Limit", advancerLimitSwitch.get());
-
+    SmartDashboard.putBoolean("Reverse Joystick", driverStick.getRawButton(12));
     
       /* end of dashboard logic */
   }
