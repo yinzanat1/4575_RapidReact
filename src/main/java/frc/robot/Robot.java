@@ -67,7 +67,9 @@ public class Robot extends TimedRobot {
 //  private final Joystick opStick = new Joystick(1);
   private final XboxController opStick = new XboxController(1);
   private final XboxController climbStick = new XboxController(2);
-      /* end of controller declarations */
+  private final Joystick driverStickBackwards = new Joystick(3);
+
+  /* end of controller declarations */
 
       /* limit switch and sensor declarations */
   private DigitalInput climberlimitSwitch = new DigitalInput(0);
@@ -157,9 +159,13 @@ if (autoStep == 0) {
     }
     /* step 2 */
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
-      m_robotDrive.tankDrive(-0.5, -0.5);
+      m_robotDrive.tankDrive(-0.5, 0.5);
 
+<<<<<<< HEAD
       if (autoTime >= 2000) {
+=======
+      if (autoTime >= 2500) {
+>>>>>>> a7d7add2371c45e6d80db09741089111b6bd8ef9
         m_robotDrive.tankDrive(0, 0);
 autoStep = 40;
         autoStep++;         // move to the next step
@@ -196,13 +202,14 @@ autoStep = 40;
       if (autoTime >= 200) {
         m_robotDrive.tankDrive(0, 0);
 
-        autoStep++;         // move to the next step
+        autoStep++;     // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
 
      /* step 6 */
-     if (autoStep == 6) {   // tank drive needs constant speed settings, so keep hitting this 
+     if (autoStep == 6) { 
+          // start intakes and drive toward the ball
       intake.set (-1);
       externalIntake.set(-1);
       m_robotDrive.tankDrive(0.5, 0.5);
@@ -212,19 +219,20 @@ autoStep = 40;
         intake.set (0);
         externalIntake.set(0);
 
-        autoStep++;         // move to the next step
+        autoStep++;     // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
 
     /* step 7 */
-    if (autoStep == 7) {      // tank drive needs constant speed settings, so keep hitting this 
+    if (autoStep == 7) {
+          // turn toward the target
       m_robotDrive.tankDrive(-0.5, 0.5);
 
       if (autoStep == 7 && autoTime >= 1150) {
         m_robotDrive.tankDrive(0, 0);
 
-        autoStep++;         // move to the next step
+        autoStep++;     // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
     }
@@ -320,8 +328,12 @@ autoStep = 40;
         advancerDelay = SmartDashboard.getNumber("Advancer Delay (ms)", 3000),
         shooterMax = SmartDashboard.getNumber("Shooter Max", 0.57);
 
-           
+boolean reverseJoystick = driverStick.getRawButton(12);
+if (!reverseJoystick) {
+  m_robotDrive.arcadeDrive(cleanZ, -cleanY); // fixing a problem
+  } else {           
     m_robotDrive.arcadeDrive(-cleanY, cleanZ);
+}    
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the Z turns left and right.
@@ -374,7 +386,11 @@ autoStep = 40;
         advancer.set(0);
       }      
     } else if (opStick.getAButton()) {
+<<<<<<< HEAD
       shooter.set(-1 * (opStick.getLeftBumper()? 40 : shooterMax));
+=======
+      shooter.set(-1 * (opStick.getLeftBumper() ? 0.40 : shooterMax));
+>>>>>>> a7d7add2371c45e6d80db09741089111b6bd8ef9
       if (shooterTime == 0) {
         shooterTime = System.currentTimeMillis();
       }
@@ -402,11 +418,11 @@ autoStep = 40;
         /* X Box Controller stick buttons */
         // climber #1
     climberSpeedTarget = climbStick.getLeftY();
-/*
+
     if (climberlimitSwitch.get()) {
       climberSpeedTarget = -1 * climberSpeedTarget;
     }
-    */
+
     climber.set(climberSpeedTarget);
     climberPivot.set(climbStick.getRightX());
     /* end of X Box Controller buttons */
@@ -417,6 +433,11 @@ autoStep = 40;
     SmartDashboard.putNumber("Advancer Delay (ms)", advancerDelay);
     SmartDashboard.putNumber("Shooter Max", shooterMax);
     SmartDashboard.putBoolean("Advancer Limit", advancerLimitSwitch.get());
+<<<<<<< HEAD
+=======
+    SmartDashboard.putBoolean("Reverse Joystick", driverStick.getRawButton(12));
+    
+>>>>>>> a7d7add2371c45e6d80db09741089111b6bd8ef9
       /* end of dashboard logic */
   }
   public void teleopEnd() {
