@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class Robot extends TimedRobot {
   /* start of hardware declarations */
         /* motor and motor controller declarations */
+/*
   private final CANSparkMax m_frontLeft = new CANSparkMax(1, MotorType.kBrushless);
   private final CANSparkMax m_backLeft = new CANSparkMax(2, MotorType.kBrushless);
   MotorControllerGroup m_leftMotor = new MotorControllerGroup(m_frontLeft, m_backLeft);
@@ -32,11 +33,11 @@ public class Robot extends TimedRobot {
   private final CANSparkMax m_frontRight = new CANSparkMax(4, MotorType.kBrushless);
   private final CANSparkMax m_backRight = new CANSparkMax(5, MotorType.kBrushless);
   MotorControllerGroup m_rightMotor = new MotorControllerGroup(m_frontRight, m_backRight);
-
+*/
           // external intake used to be neo 550 but it was changed to a 775 motor, left this here as an example
   //private final CANSparkMax externalIntake = new CANSparkMax(3, MotorType.kBrushless);
 //  private final CANSparkMax climber = new CANSparkMax(6, MotorType.kBrushless);
-  private final CANSparkMax climber = new CANSparkMax(3, MotorType.kBrushless);
+//  private final CANSparkMax climber = new CANSparkMax(3, MotorType.kBrushless);
 //  private final CANSparkMax climber2 = new CANSparkMax(7, MotorType.kBrushless);
 //  private final CANSparkMax climber3 = new CANSparkMax(8, MotorType.kBrushless);
 
@@ -44,8 +45,19 @@ public class Robot extends TimedRobot {
   private final Spark advancer = new Spark(1);
   private final Spark shooter = new Spark(2);
   private final Spark intakeInOut = new Spark(3);
+  private final Spark climber = new Spark(4);
+
   private final Spark externalIntake = new Spark(5);          /* 775 motor version of external intake */
   private final Spark climberPivot = new Spark(6);
+
+  private final Spark m_frontLeft = new Spark(7);
+  private final Spark m_backLeft = new Spark(8);
+  MotorControllerGroup m_leftMotor = new MotorControllerGroup(m_frontLeft, m_backLeft);
+
+  private final Spark m_frontRight = new Spark(9);
+  private final Spark m_backRight = new Spark(10);
+  MotorControllerGroup m_rightMotor = new MotorControllerGroup(m_frontRight, m_backRight);
+
 
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
       /* end of motor and controller delcarations */
@@ -69,7 +81,12 @@ public class Robot extends TimedRobot {
   private double autoTime = 0;
   private double driveOffset = 0;   // delay in ms to wait before driving off tarmac
   private double extraDrive = 0;   // extra time to drive to get clear of teammates
-private double outputValue = 0;   // for whatever we need, remove for production
+  private double outputValue = 0;   // for whatever we need, remove for production
+
+  private boolean intakeOn = false;    // turn intake on or off
+  private boolean advanceToLimit = false;   // if this is set the advancer will drive until the ball hits the limit switch
+  private boolean shooterOn = false;   // turn shooter on
+
   @Override
   public void robotInit() {
     // We need to invert one side of the drivetrain so that positive voltages
@@ -118,7 +135,7 @@ if (autoStep == 0) {
 */ 
 /* step 0 */
     if (autoStep == 0) {
-      shooter.set(-0.65);
+      shooter.set(-0.57);
       if (autoTime >= 1350) {
         // leaving the shooter on, will turn it off at the end of step 1
 
@@ -142,9 +159,9 @@ if (autoStep == 0) {
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
       m_robotDrive.tankDrive(-0.5, -0.5);
 
-      if (autoTime >= 1000) {
+      if (autoTime >= 2000) {
         m_robotDrive.tankDrive(0, 0);
-
+autoStep = 40;
         autoStep++;         // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
@@ -301,7 +318,7 @@ if (autoStep == 0) {
         climberSpeedTarget = 0,
         advancerMax = SmartDashboard.getNumber("Advancer Max", 1.0),
         advancerDelay = SmartDashboard.getNumber("Advancer Delay (ms)", 3000),
-        shooterMax = SmartDashboard.getNumber("Shooter Max", 1.0);
+        shooterMax = SmartDashboard.getNumber("Shooter Max", 0.57);
 
            
     m_robotDrive.arcadeDrive(-cleanY, cleanZ);
@@ -312,20 +329,38 @@ if (autoStep == 0) {
     if (opStick.getYButton() && opStick.getXButton()) {
       intake.set(1);
       externalIntake.set(1);
-    } else if (opStick.getYButton()) {
-      intake.set(-1);
-      externalIntake.set(-1);
     } else {
-      intake.set(0);
-      externalIntake.set(0);
+      if (opStick.getYButtonPressed()) {
+        intakeOn = !intakeOn;
+      }
+      if (intakeOn) {
+        intake.set(-1);
+        externalIntake.set(-1);
+      } else {
+        intake.set(0);
+        externalIntake.set(0);
+      }
     }
 
-    if (opStick.getBButton() && opStick.getXButton()) {
+    if (opStick.getRightBumper() && opStick.getXButton()) {
       advancer.set(-1 * advancerMax);
-    } else if (opStick.getBButton()) {
+    } else if (opStick.getRightBumper()) {
       advancer.set(advancerMax);
     } else {
       advancer.set(0);
+    }
+
+          // turn on the advancer until the ball hits the limit
+    if (opStick.getBButtonPressed()) {
+      advanceToLimit = true;
+    }
+    if (advanceToLimit) {
+      if (advancerLimitSwitch.get()) {
+        advancer.set(advancerMax);
+      } else {
+        advancer.set(0);
+        advanceToLimit = false;
+      }
     }
 
     if (opStick.getAButton() && opStick.getXButton()) {
@@ -339,7 +374,7 @@ if (autoStep == 0) {
         advancer.set(0);
       }      
     } else if (opStick.getAButton()) {
-      shooter.set(-1 * shooterMax);
+      shooter.set(-1 * (opStick.getLeftBumper()? 40 : shooterMax));
       if (shooterTime == 0) {
         shooterTime = System.currentTimeMillis();
       }
@@ -377,19 +412,11 @@ if (autoStep == 0) {
     /* end of X Box Controller buttons */
 
       /* dashboard logic */
-    SmartDashboard.putNumber("climber E", climber.getEncoder().getPosition());
-
-    SmartDashboard.putBoolean("limit switch", climberlimitSwitch.get());
-
-    SmartDashboard.putNumber("climberSpeedTarget", climberSpeedTarget);
-
     SmartDashboard.putNumber("outputValue", outputValue);
     SmartDashboard.putNumber("Advancer Max", advancerMax);
     SmartDashboard.putNumber("Advancer Delay (ms)", advancerDelay);
     SmartDashboard.putNumber("Shooter Max", shooterMax);
     SmartDashboard.putBoolean("Advancer Limit", advancerLimitSwitch.get());
-
-    
       /* end of dashboard logic */
   }
   public void teleopEnd() {
