@@ -161,11 +161,7 @@ if (autoStep == 0) {
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
       m_robotDrive.tankDrive(-0.5, 0.5);
 
-<<<<<<< HEAD
-      if (autoTime >= 2000) {
-=======
       if (autoTime >= 2500) {
->>>>>>> a7d7add2371c45e6d80db09741089111b6bd8ef9
         m_robotDrive.tankDrive(0, 0);
 autoStep = 40;
         autoStep++;         // move to the next step
@@ -386,11 +382,7 @@ if (!reverseJoystick) {
         advancer.set(0);
       }      
     } else if (opStick.getAButton()) {
-<<<<<<< HEAD
-      shooter.set(-1 * (opStick.getLeftBumper()? 40 : shooterMax));
-=======
       shooter.set(-1 * (opStick.getLeftBumper() ? 0.40 : shooterMax));
->>>>>>> a7d7add2371c45e6d80db09741089111b6bd8ef9
       if (shooterTime == 0) {
         shooterTime = System.currentTimeMillis();
       }
@@ -433,11 +425,7 @@ if (!reverseJoystick) {
     SmartDashboard.putNumber("Advancer Delay (ms)", advancerDelay);
     SmartDashboard.putNumber("Shooter Max", shooterMax);
     SmartDashboard.putBoolean("Advancer Limit", advancerLimitSwitch.get());
-<<<<<<< HEAD
-=======
     SmartDashboard.putBoolean("Reverse Joystick", driverStick.getRawButton(12));
-    
->>>>>>> a7d7add2371c45e6d80db09741089111b6bd8ef9
       /* end of dashboard logic */
   }
   public void teleopEnd() {
