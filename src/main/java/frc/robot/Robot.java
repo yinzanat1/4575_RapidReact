@@ -51,6 +51,7 @@ public class Robot extends TimedRobot {
   private final Spark externalIntake = new Spark(5);          /* 775 motor version of external intake */
   private final Spark climberPivot = new Spark(2); 
 
+      // after the inversion problem, Michael Yu from 3181 suggested changing from groups to follow 
   private final Spark m_frontLeft = new Spark(6);
   private final Spark m_backLeft = new Spark(7);
   MotorControllerGroup m_leftMotor = new MotorControllerGroup(m_frontLeft, m_backLeft);
@@ -59,7 +60,7 @@ public class Robot extends TimedRobot {
   private final Spark m_backRight = new Spark(9);
   MotorControllerGroup m_rightMotor = new MotorControllerGroup(m_frontRight, m_backRight);
 
-
+  
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
       /* end of motor and controller delcarations */
 
@@ -316,15 +317,6 @@ autoStep = 40;
     }
     /* end of driver stick buttons */
 
-    if (driverStick.getRawButton(3)) {
-      m_backLeft.set(1);
-    }
-    if (driverStick.getRawButton(4)) {
-      m_backRight.set(1);
-    }
-        
-
-
     double cleanX = deadbandJoystick(driverStick.getX() * speedLimit),
         cleanY = deadbandJoystick(driverStick.getY() * speedLimit),
         cleanZ = deadbandJoystick(driverStick.getZ() * speedLimit),
@@ -335,7 +327,7 @@ autoStep = 40;
         shooterMax = SmartDashboard.getNumber("Shooter Max", 0.57);
 
 boolean reverseJoystick = driverStick.getRawButton(12);
-if (!reverseJoystick) {
+if (reverseJoystick) {
   m_robotDrive.arcadeDrive(cleanZ, -cleanY); // fixing a problem
   } else {           
     m_robotDrive.arcadeDrive(-cleanY, cleanZ);
