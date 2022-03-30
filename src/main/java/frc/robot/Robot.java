@@ -360,10 +360,11 @@ if (reverseJoystick) {
       advancer.set(0);
     }
 
-          // turn on the advancer until the ball hits the limit
+        // toggle advancer
     if (opStick.getBButtonPressed()) {
-      advanceToLimit = true;
+      advanceToLimit = !advanceToLimit;
     }
+          // turn on the advancer until the ball hits the limit
     if (advanceToLimit) {
       if (advancerLimitSwitch.get()) {
         advancer.set(advancerMax);
