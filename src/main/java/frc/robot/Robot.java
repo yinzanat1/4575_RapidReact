@@ -40,22 +40,23 @@ public class Robot extends TimedRobot {
 //  private final CANSparkMax climber = new CANSparkMax(3, MotorType.kBrushless);
 //  private final CANSparkMax climber2 = new CANSparkMax(7, MotorType.kBrushless);
 //  private final CANSparkMax climber3 = new CANSparkMax(8, MotorType.kBrushless);
+  private final CANSparkMax shooter = new CANSparkMax(1, MotorType.kBrushless);
 
   private final Spark intake = new Spark(0);
   private final Spark advancer = new Spark(1);
-  private final Spark shooter = new Spark(2);
+//  private final Spark shooter = new Spark(2);  // spark max now
   private final Spark intakeInOut = new Spark(3);
   private final Spark climber = new Spark(4);
 
   private final Spark externalIntake = new Spark(5);          /* 775 motor version of external intake */
-  private final Spark climberPivot = new Spark(6);
+  private final Spark climberPivot = new Spark(2); 
 
-  private final Spark m_frontLeft = new Spark(7);
-  private final Spark m_backLeft = new Spark(8);
+  private final Spark m_frontLeft = new Spark(6);
+  private final Spark m_backLeft = new Spark(7);
   MotorControllerGroup m_leftMotor = new MotorControllerGroup(m_frontLeft, m_backLeft);
 
-  private final Spark m_frontRight = new Spark(9);
-  private final Spark m_backRight = new Spark(10);
+  private final Spark m_frontRight = new Spark(8);
+  private final Spark m_backRight = new Spark(9);
   MotorControllerGroup m_rightMotor = new MotorControllerGroup(m_frontRight, m_backRight);
 
 
@@ -314,6 +315,15 @@ autoStep = 40;
       speedLimit = 0.5;
     }
     /* end of driver stick buttons */
+
+    if (driverStick.getRawButton(3)) {
+      m_backLeft.set(1);
+    }
+    if (driverStick.getRawButton(4)) {
+      m_backRight.set(1);
+    }
+        
+
 
     double cleanX = deadbandJoystick(driverStick.getX() * speedLimit),
         cleanY = deadbandJoystick(driverStick.getY() * speedLimit),
