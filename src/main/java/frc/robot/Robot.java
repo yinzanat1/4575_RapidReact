@@ -69,7 +69,6 @@ public class Robot extends TimedRobot {
 //  private final Joystick opStick = new Joystick(1);
   private final XboxController opStick = new XboxController(1);
   private final XboxController climbStick = new XboxController(2);
-  private final Joystick driverStickBackwards = new Joystick(3);
 
   /* end of controller declarations */
 
@@ -83,13 +82,14 @@ public class Robot extends TimedRobot {
   private double shooterTime;
   private int autoStep = 0;
   private double autoTime = 0;
-  private double driveOffset = 0;   // delay in ms to wait before driving off tarmac
-  private double extraDrive = 0;   // extra time to drive to get clear of teammates
+  private double targetGoal = 1;   // 1 for high, 0 or low
+  private double programLength = 0;   // short (0) or long (1) auto
   private double outputValue = 0;   // for whatever we need, remove for production
 
   private boolean intakeOn = false;    // turn intake on or off
   private boolean advanceToLimit = false;   // if this is set the advancer will drive until the ball hits the limit switch
   private boolean shooterOn = false;   // turn shooter on
+  private boolean driverStickBackwards = false;
 
   @Override
   public void robotInit() {
@@ -105,8 +105,8 @@ public class Robot extends TimedRobot {
 //    SmartDashboard.putNumber("Drive Delay", driveOffset);
 //    SmartDashboard.putNumber("Extra Drive Time", extraDrive);
 
-    driveOffset = SmartDashboard.getNumber("Drive Delay (in ms)", driveOffset);
-    extraDrive = SmartDashboard.getNumber("Extra Drive Time (in ms)", extraDrive);
+    targetGoal = SmartDashboard.getNumber("Auto/Target Goal 0 or 1", targetGoal);
+    programLength = SmartDashboard.getNumber("Auto/Short (0) or Long (1)", programLength);
     autoStep = 0;
     autoTime = 0;
   }
@@ -139,8 +139,9 @@ if (autoStep == 0) {
 */ 
 /* step 0 */
     if (autoStep == 0) {
-      shooter.set(-0.57);
-      if (autoTime >= 1350) {
+      shooter.set((targetGoal == 0 ? 0.4 : -0.57));
+              // move to the next step when we hit the time limit or shooter is up to speed
+      if ((autoTime >= 1350) || (shooter.getEncoder().getVelocity() >= 1000)) {
         // leaving the shooter on, will turn it off at the end of step 1
 
         autoStep++;         // move to the next step
@@ -161,11 +162,13 @@ if (autoStep == 0) {
     }
     /* step 2 */
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
-      m_robotDrive.tankDrive(-0.5, 0.5);
+      m_robotDrive.tankDrive(-0.5,-0.5);
 
       if (autoTime >= 2500) {
         m_robotDrive.tankDrive(0, 0);
-autoStep = 40;
+        if (programLength == 0) {
+          autoStep = 40;    // set the step counter to a very high number to end the auto
+        }
         autoStep++;         // move to the next step
         autoTime = 0;   // this will tell the next step its time to init
       }
@@ -194,7 +197,7 @@ autoStep = 40;
     }
 
     /* step 5 */
-    if (autoStep == 5) {
+    if (autoStep == 5) { 
       // keep rotating 
 
       if (autoTime >= 200) {
@@ -326,8 +329,10 @@ autoStep = 40;
         advancerDelay = SmartDashboard.getNumber("Advancer Delay (ms)", 3000),
         shooterMax = SmartDashboard.getNumber("Shooter Max", 0.57);
 
-boolean reverseJoystick = driverStick.getRawButton(12);
-if (reverseJoystick) {
+if (driverStick.getRawButtonPressed(12)) {
+  driverStickBackwards = !driverStickBackwards;
+}
+if (driverStickBackwards) {
   m_robotDrive.arcadeDrive(cleanZ, -cleanY); // fixing a problem
   } else {           
     m_robotDrive.arcadeDrive(-cleanY, cleanZ);
@@ -366,7 +371,7 @@ if (reverseJoystick) {
     }
           // turn on the advancer until the ball hits the limit
     if (advanceToLimit) {
-      if (advancerLimitSwitch.get()) {
+      if (advancerLimitSwitch.get()) {    // might need to not this if the switch is normally closed
         advancer.set(advancerMax);
       } else {
         advancer.set(0);
@@ -379,7 +384,7 @@ if (reverseJoystick) {
       if (shooterTime == 0) {
         shooterTime = System.currentTimeMillis();
       }
-      if (System.currentTimeMillis() - shooterTime >= advancerDelay) {
+      if ((shooter.getEncoder().getVelocity() >= 1000) || (System.currentTimeMillis() - shooterTime >= advancerDelay)) {
         advancer.set(advancerMax);
       } else {
         advancer.set(0);
@@ -423,11 +428,10 @@ if (reverseJoystick) {
     /* end of X Box Controller buttons */
 
       /* dashboard logic */
-    SmartDashboard.putNumber("outputValue", outputValue);
-    SmartDashboard.putNumber("Advancer Max", advancerMax);
-    SmartDashboard.putNumber("Advancer Delay (ms)", advancerDelay);
-    SmartDashboard.putNumber("Shooter Max", shooterMax);
-    SmartDashboard.putBoolean("Advancer Limit", advancerLimitSwitch.get());
+    SmartDashboard.putNumber("Advancer/Advancer Max", advancerMax);
+    SmartDashboard.putNumber("Advancer/Advancer Delay (ms)", advancerDelay);
+    SmartDashboard.putNumber("Shooter/Shooter Max", shooterMax);
+    SmartDashboard.putBoolean("Advancer/Advancer Limit", advancerLimitSwitch.get());
     SmartDashboard.putBoolean("Reverse Joystick", driverStick.getRawButton(12));
       /* end of dashboard logic */
   }
