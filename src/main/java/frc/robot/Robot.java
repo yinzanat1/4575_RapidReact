@@ -5,14 +5,17 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import javax.lang.model.element.Element;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -41,8 +44,9 @@ public class Robot extends TimedRobot {
 //  private final CANSparkMax climber2 = new CANSparkMax(7, MotorType.kBrushless);
 //  private final CANSparkMax climber3 = new CANSparkMax(8, MotorType.kBrushless);
   private final CANSparkMax shooter = new CANSparkMax(1, MotorType.kBrushless);
+  private final CANSparkMax intake = new CANSparkMax(2, MotorType.kBrushless);
 
-  private final Spark intake = new Spark(0);
+//  private final Spark intake = new Spark(0);
   private final Spark advancer = new Spark(1);
 //  private final Spark shooter = new Spark(2);  // spark max now
   private final Spark intakeInOut = new Spark(3);
@@ -97,6 +101,8 @@ public class Robot extends TimedRobot {
     // result in both sides moving forward. Depending on how your robot's
     // gearbox is constructed, you might have to invert the left side instead.
     m_rightMotor.setInverted(true);
+
+    Shuffleboard.getTab("debug").add(new PowerDistribution());
   }
 
   @Override
@@ -139,9 +145,9 @@ if (autoStep == 0) {
 */ 
 /* step 0 */
     if (autoStep == 0) {
-      shooter.set((targetGoal == 0 ? 0.4 : -0.57));
+      shooter.set((targetGoal == 0 ? -0.25 : -0.425));
               // move to the next step when we hit the time limit or shooter is up to speed
-      if ((autoTime >= 1350) || (shooter.getEncoder().getVelocity() >= 1000)) {
+      if ((autoTime >= 1350) || (shooter.getEncoder().getVelocity() <= (targetGoal == 0 ? -1200 : -2200))) {
         // leaving the shooter on, will turn it off at the end of step 1
 
         autoStep++;         // move to the next step
@@ -164,7 +170,7 @@ if (autoStep == 0) {
     if (autoStep == 2) {   // tank drive needs constant speed settings, so keep hitting this 
       m_robotDrive.tankDrive(-0.5,-0.5);
 
-      if (autoTime >= 2500) {
+      if (autoTime >= 5500) {
         m_robotDrive.tankDrive(0, 0);
         if (programLength == 0) {
           autoStep = 40;    // set the step counter to a very high number to end the auto
@@ -319,16 +325,20 @@ if (autoStep == 0) {
       speedLimit = 0.5;
     }
     /* end of driver stick buttons */
-
+/*
     double cleanX = deadbandJoystick(driverStick.getX() * speedLimit),
         cleanY = deadbandJoystick(driverStick.getY() * speedLimit),
         cleanZ = deadbandJoystick(driverStick.getZ() * speedLimit),
+*/
+        double cleanX = driverStick.getX() * speedLimit,
+        cleanY = driverStick.getY() * speedLimit,
+        cleanZ = driverStick.getZ() * speedLimit,
 
         climberSpeedTarget = 0,
         advancerMax = SmartDashboard.getNumber("Advancer Max", 1.0),
         advancerDelay = SmartDashboard.getNumber("Advancer Delay (ms)", 3000),
-        shooterMax = SmartDashboard.getNumber("Shooter Max", 0.57);
-
+        shooterMax = SmartDashboard.getNumber("Shooter Max", 0.41);
+/*
 if (driverStick.getRawButtonPressed(12)) {
   driverStickBackwards = !driverStickBackwards;
 }
@@ -337,10 +347,13 @@ if (driverStickBackwards) {
   } else {           
     m_robotDrive.arcadeDrive(-cleanY, cleanZ);
 }    
+*/
+m_robotDrive.arcadeDrive(-cleanY, cleanZ);
     // Drive with arcade drive.
     // That means that the Y axis drives forward
     // and backward, and the Z turns left and right.
     /* start of operator buttons */
+/*
     if (opStick.getYButton() && opStick.getXButton()) {
       intake.set(1);
       externalIntake.set(1);
@@ -356,15 +369,19 @@ if (driverStickBackwards) {
         externalIntake.set(0);
       }
     }
-
-    if (opStick.getRightBumper() && opStick.getXButton()) {
-      advancer.set(-1 * advancerMax);
-    } else if (opStick.getRightBumper()) {
-      advancer.set(advancerMax);
+  */
+    if (opStick.getYButton() && opStick.getXButton()) {
+      intake.set(-1);
+      externalIntake.set(1);
+    } else if (opStick.getYButton()) {
+        intake.set(1);
+        externalIntake.set(-1);
     } else {
-      advancer.set(0);
+      intake.set(0);
+      externalIntake.set(0);
     }
 
+/*
         // toggle advancer
     if (opStick.getBButtonPressed()) {
       advanceToLimit = !advanceToLimit;
@@ -378,6 +395,15 @@ if (driverStickBackwards) {
         advanceToLimit = false;
       }
     }
+*/
+advancerMax = 1.0;
+    if (opStick.getBButton() && opStick.getXButton()) {
+      advancer.set(-1 * advancerMax);
+    } else if (opStick.getBButton()) {
+      advancer.set(advancerMax);
+    } else {
+      advancer.set(0);
+    }
 
     if (opStick.getAButton() && opStick.getXButton()) {
       shooter.set(shooterMax);
@@ -390,11 +416,11 @@ if (driverStickBackwards) {
         advancer.set(0);
       }      
     } else if (opStick.getAButton()) {
-      shooter.set(-1 * (opStick.getLeftBumper() ? 0.40 : shooterMax));
+      shooter.set(-1 * (opStick.getLeftBumper() ? 0.25 : shooterMax));
       if (shooterTime == 0) {
         shooterTime = System.currentTimeMillis();
       }
-      if (System.currentTimeMillis() - shooterTime >= advancerDelay) {
+      if (System.currentTimeMillis() - shooterTime >= advancerDelay || shooter.getEncoder().getVelocity() <= (opStick.getLeftBumper() ? -1000 : -2200)) {
         advancer.set(advancerMax);
       } else {
         advancer.set(0);
@@ -428,11 +454,7 @@ if (driverStickBackwards) {
     /* end of X Box Controller buttons */
 
       /* dashboard logic */
-    SmartDashboard.putNumber("Advancer/Advancer Max", advancerMax);
-    SmartDashboard.putNumber("Advancer/Advancer Delay (ms)", advancerDelay);
-    SmartDashboard.putNumber("Shooter/Shooter Max", shooterMax);
-    SmartDashboard.putBoolean("Advancer/Advancer Limit", advancerLimitSwitch.get());
-    SmartDashboard.putBoolean("Reverse Joystick", driverStick.getRawButton(12));
+    SmartDashboard.putNumber("shooter rpm", shooter.getEncoder().getVelocity());
       /* end of dashboard logic */
   }
   public void teleopEnd() {
@@ -449,7 +471,7 @@ if (driverStickBackwards) {
     shooter.set(0);
     intakeInOut.set(0);
     externalIntake.set(0);    
-}
+  }
 
   private double deadbandJoystick (double inAxis) {
     double retVal;
