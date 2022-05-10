@@ -47,21 +47,21 @@ public class Robot extends TimedRobot {
   private final CANSparkMax intake = new CANSparkMax(2, MotorType.kBrushless);
 
 //  private final Spark intake = new Spark(0);
-  private final Spark advancer = new Spark(1);
+  private final Spark advancer = new Spark(9);
 //  private final Spark shooter = new Spark(2);  // spark max now
-  private final Spark intakeInOut = new Spark(3);
-  private final Spark climber = new Spark(4);
+  private final Spark intakeInOut = new Spark(4);
+  private final Spark climber = new Spark(8);
 
   private final Spark externalIntake = new Spark(5);          /* 775 motor version of external intake */
   private final Spark climberPivot = new Spark(2); 
 
       // after the inversion problem, Michael Yu from 3181 suggested changing from groups to follow 
-  private final Spark m_frontLeft = new Spark(6);
-  private final Spark m_backLeft = new Spark(7);
+  private final Spark m_frontLeft = new Spark(1);
+  private final Spark m_backLeft = new Spark(0);
   MotorControllerGroup m_leftMotor = new MotorControllerGroup(m_frontLeft, m_backLeft);
 
-  private final Spark m_frontRight = new Spark(8);
-  private final Spark m_backRight = new Spark(9);
+  private final Spark m_frontRight = new Spark(7);
+  private final Spark m_backRight = new Spark(3);
   MotorControllerGroup m_rightMotor = new MotorControllerGroup(m_frontRight, m_backRight);
 
   
