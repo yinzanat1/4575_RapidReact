@@ -25,9 +25,9 @@ public class TheDomino {
         float hue;
         float saturation;
         float value;
-float gain = 2;
+//float gain = 2;
 /* */
-        ((NormalizedColorSensor) theColorinator).setGain(gain);
+//        ((NormalizedColorSensor) theColorinator).setGain(gain);
         // Read color from the sensor.
         normalizedColors = ((NormalizedColorSensor) theColorinator).getNormalizedColors();
         // Convert RGB values to Hue, Saturation, and Value.

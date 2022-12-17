@@ -25,6 +25,7 @@ public class PowerPlay extends LinearOpMode{
     private BNO055IMU emuIMU1;
     private BNO055IMU emuIMU2;
     private Servo claw;
+    private Servo flipper;
 
     @Override
     public void runOpMode() {
@@ -47,6 +48,10 @@ public class PowerPlay extends LinearOpMode{
         claw = hardwareMap.get(Servo.class, "claw1");
         boolean clawFlag = false;
 
+        // cone flipper
+        flipper = hardwareMap.get(Servo.class, "flipper");
+        boolean flipFlag = false;
+
         //Initiates two IMUs for the control and expansion hubs
         emuIMU1 = hardwareMap.get(BNO055IMU.class, "imu1");
         emuIMU2 = hardwareMap.get(BNO055IMU.class, "imu2");
@@ -60,48 +65,31 @@ public class PowerPlay extends LinearOpMode{
         telemetry.update();
 
         while (opModeIsActive()) {
-//            float powerRightY, float powerLeftY, float powerRightX, float powerLeftX
             myDrive.setDrivePower(gamepad1.right_stick_y, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
-            //          myDrive.dPadDrive(gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.dpad_right, gamepad1.dpad_left);
-            //boxerDoggo.runChainBox(gamepad2.left_stick_y, gamepad2.right_stick_y);
-            boxerDoggo.clawUpDown(gamepad2.right_stick_y);
             if (gamepad2.left_bumper) {
                 boxerDoggo.runChainBox(gamepad2.right_stick_y);
             } else {
                 boxerDoggo.clawUpDown(gamepad2.right_stick_y);
             }
 
-         //   boxerDoggo.runChainBoxFull(gamepad2.dpad_up, gamepad2.dpad_down, gamepad2.dpad_right, gamepad2.dpad_left);
-
-            if (clawFlag) {
-                if (gamepad2.a) {
+            if (gamepad2.a) {
+                if (!clawFlag) {
                     clawFlag = true;
                     claw.setPosition(1 - claw.getPosition());
-                } else {
-                    clawFlag = false;
                 }
+            } else {
+                clawFlag = false;
             }
 
- //          myDrive.whereAmI(tuxEmu1.getAngleZExtrinsic());
+            if (gamepad2.b) {
+                if (!flipFlag) {
+                    flipFlag = true;
+                    flipper.setPosition(1 - flipper.getPosition());
+                }
+            } else {
+                flipFlag = false;
+            }
 
-           telemetry.addData("Never Eat Soggy Waffles", myDrive.soggyWafflesScheduler(gamepad1.dpad_up, gamepad1.dpad_down, gamepad1.dpad_right, gamepad1.dpad_left, gamepad1.a));
-/*
-           telemetry.addData("tuxEmu1 Intrinsic", tuxEmu1.getAngleZIntrinsic());
-           telemetry.addData("tuxEmu2 Intrinsic", tuxEmu2.getAngleZIntrinsic());
-           telemetry.addData("tuxEmu1 Extrinsic", tuxEmu1.getAngleZExtrinsic());
-           telemetry.addData("tuxEmu2 Extrinsic", tuxEmu2.getAngleZExtrinsic());
-*/
-            telemetry.addData("Where is Me", myDrive.xSaved.toString() + "," + myDrive.ySaved.toString());
-            telemetry.addData("rightMotorF", myDrive.rightMotorF.getPower());
-            telemetry.addData("leftMotorF", myDrive.leftMotorF.getPower());
-            telemetry.addData("rightMotorB", myDrive.rightMotorB.getPower());
-            telemetry.addData("leftMotorB", myDrive.leftMotorB.getPower());
-            /*
-            telemetry.addData("rightMotorF", myDrive.rightMotorF.getCurrentPosition());
-            telemetry.addData("leftMotorF", myDrive.leftMotorF.getCurrentPosition());
-            telemetry.addData("rightMotorB", myDrive.rightMotorB.getCurrentPosition());
-            telemetry.addData("leftMotorB", myDrive.leftMotorB.getCurrentPosition());
-             */
             telemetry.update();
         }
     }

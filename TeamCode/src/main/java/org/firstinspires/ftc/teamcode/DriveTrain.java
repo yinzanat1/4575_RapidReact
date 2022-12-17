@@ -143,6 +143,7 @@ public class DriveTrain {
             backPower = powerLeftX - (powerRightX*powerVar);
             leftPower = powerLeftY - (powerRightX*powerVar);
         } else if (driveType == 3) {
+                    // left stick moves the robot, right stick rotates the robot (with x, y does nothing)
             //ZK - 9/24/2022 - Mecanum Drive
             double leftX = powerLeftX * 1.1;
             double denominator = Math.max(Math.abs(powerLeftY) + Math.abs(leftX) + Math.abs(powerRightX), 1);
